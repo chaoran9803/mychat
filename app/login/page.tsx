@@ -2,8 +2,10 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,12 +18,12 @@ export default function LoginPage() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        window.location.href = "/home";
+        router.push("/home");
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [router]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -56,7 +58,7 @@ export default function LoginPage() {
       if (signInError) {
         setError(signInError.message);
       } else if (data.session) {
-        window.location.href = "/home";
+        router.push("/home");
       } else {
         setMessage("Login successful. Redirecting...");
       }
