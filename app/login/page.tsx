@@ -18,7 +18,7 @@ export default function LoginPage() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        window.location.href = "/";
+        window.location.href = "/home";
       }
     });
 
@@ -65,7 +65,7 @@ export default function LoginPage() {
       if (signInError) {
         setError(signInError.message);
       } else if (data.session) {
-        window.location.href = "/";
+        window.location.href = "/home";
       } else {
         setMessage("Login successful. Redirecting...");
       }
