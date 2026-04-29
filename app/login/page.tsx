@@ -3,11 +3,9 @@
 import { FormEvent, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-const USERNAME_EMAIL_DOMAIN = "mychat.local";
-
 export default function LoginPage() {
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -25,30 +23,23 @@ export default function LoginPage() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const normalizeUsername = (value: string) => value.trim().toLowerCase();
-  const buildAuthEmail = (name: string) => `${name}@${USERNAME_EMAIL_DOMAIN}`;
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
     setMessage(null);
 
-    const normalized = normalizeUsername(username);
-    if (!normalized || !password) {
-      setError("Please enter both username and password.");
+    const emailValue = email.trim().toLowerCase();
+    if (!emailValue || !password) {
+      setError("Please enter both email and password.");
       return;
     }
 
     setLoading(true);
-    const email = buildAuthEmail(normalized);
 
     if (mode === "signUp") {
       const { error: signUpError } = await supabase.auth.signUp({
-        email,
+        email: emailValue,
         password,
-        options: {
-          data: { username: normalized },
-        },
       });
 
       if (signUpError) {
@@ -58,7 +49,7 @@ export default function LoginPage() {
       }
     } else {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
+        email: emailValue,
         password,
       });
 
@@ -85,19 +76,15 @@ export default function LoginPage() {
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-semibold leading-tight md:text-5xl">Welcome to MYCHAT</h1>
-              <p className="max-w-xl text-sm leading-7 text-white/85">
-              </p>
             </div>
-            
           </div>
-  
         </div>
 
         <div className="rounded-[32px] bg-[#f6f8fb] p-6 shadow-[0_15px_40px_rgba(15,23,42,0.08)] md:p-8">
           <div className="mb-6 flex items-center justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.24em] text-slate-500">{mode === "signIn" ? "Sign in" : "Create account"}</p>
-              <h2 className="text-3xl font-semibold text-slate-950">{mode === "signIn" ? "Username login" : "Register account"}</h2>
+              <h2 className="text-3xl font-semibold text-slate-950">{mode === "signIn" ? "Email login" : "Register account"}</h2>
             </div>
             <button
               type="button"
@@ -115,11 +102,11 @@ export default function LoginPage() {
           <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Username</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">Email</label>
                 <input
-                  value={username}
-                  onChange={(event) => setUsername(event.target.value)}
-                  placeholder="Please enter username"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="Please enter email"
                   className="w-full rounded-3xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#0084ff] focus:ring-2 focus:ring-[#bfdbfe]"
                 />
               </div>
